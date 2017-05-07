@@ -27,5 +27,7 @@
   padding: 0;
 }
 
-html, body { font-family: 'Open Sans', sans-serif; }
+html, body { 
+  font-family: 'Open Sans', sans-serif;
+}
 </style>
