@@ -15,7 +15,7 @@
     mounted () {
       this.userId = window.localStorage.getItem('userId')
       if (!this.userId) {
-        const uuid = ((((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1) + (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1))
+        const uuid = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1)
         window.localStorage.setItem('userId', uuid)
       }
     }
