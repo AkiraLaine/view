@@ -1,0 +1,51 @@
+2386-05-06T22:45:37.070294700 0.010822s notice: In recursion: removing file 'C:\\Users\\Gregory\\Projects\\personal\\view\\rethinkdb_data\\tmp'
+2386-05-06T22:45:37.070794900 0.011328s warn: Trying to delete non-existent file 'C:\\Users\\Gregory\\Projects\\personal\\view\\rethinkdb_data\\tmp'
+2386-05-06T22:45:37.071795600 0.012328s notice: Initializing directory C:\\Users\\Gregory\\Projects\\personal\\view\\rethinkdb_data
+2386-05-06T22:45:37.072796300 0.013285s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory 'C:\\Users\\Gregory\\Projects\\personal\\view\\rethinkdb_data' did not already exist or is empty.)
+2386-05-06T22:45:37.072796301 0.013330s notice: Running rethinkdb 2.3.2-windows-beta (MSC 190023506)...
+2386-05-06T22:45:37.072796302 0.013504s notice: Running on 6.2.9200 (Windows 8, Server 2012)
+2386-05-06T22:45:37.072796303 0.013520s notice: Loading data from directory C:\\Users\\Gregory\\Projects\\personal\\view\\rethinkdb_data
+2386-05-06T22:45:37.314137600 0.254688s info: Cache size is set to 200 MB
+2386-05-06T22:45:37.315138700 0.256032s notice: Listening for intracluster connections on port 56613
+2386-05-06T22:45:37.316639200 0.257177s notice: Listening for client driver connections on port 56614
+2386-05-06T22:45:37.316639201 0.257343s notice: Listening for administrative HTTP connections on port 56615
+2386-05-06T22:45:37.316639202 0.257365s notice: Listening on cluster address: 127.0.0.1
+2386-05-06T22:45:37.316639203 0.257393s notice: Listening on driver address: 127.0.0.1
+2386-05-06T22:45:37.316639204 0.257395s notice: Listening on http address: 127.0.0.1
+2386-05-06T22:45:37.316639205 0.257398s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2386-05-06T22:45:37.316639206 0.257406s notice: Server ready, "RZB_US_SF_180_0cd" 5a54d3cc-9525-43e8-822b-92419689bc3d
+2386-05-06T22:45:37.508777600 0.449238s info: Table 4631bd7a-32da-4b70-9491-5307989ab8db: Starting a new Raft election for term 1.
+2386-05-06T22:45:37.509278600 0.449896s info: Table 4631bd7a-32da-4b70-9491-5307989ab8db: Added replica on this server.
+2386-05-06T22:45:37.510788900 0.451488s info: Table d77cb560-c7b8-40ba-b11c-c522ac4a6e4e: Starting a new Raft election for term 1.
+2386-05-06T22:45:37.511280000 0.451743s info: Table d77cb560-c7b8-40ba-b11c-c522ac4a6e4e: Added replica on this server.
+2386-05-06T22:45:37.513279800 0.453788s info: Table 3680e0e5-d1e8-4fc1-9825-e4d580d67d39: Starting a new Raft election for term 1.
+2386-05-06T22:45:37.513279801 0.454028s info: Table 3680e0e5-d1e8-4fc1-9825-e4d580d67d39: Added replica on this server.
+2386-05-06T22:45:37.516282000 0.456793s info: Table 4631bd7a-32da-4b70-9491-5307989ab8db: This server is Raft leader for term 1. Latest log index is 0.
+2386-05-06T22:45:37.517293700 0.458014s info: Table d77cb560-c7b8-40ba-b11c-c522ac4a6e4e: This server is Raft leader for term 1. Latest log index is 0.
+2386-05-06T22:45:37.517293701 0.458061s info: Table 3680e0e5-d1e8-4fc1-9825-e4d580d67d39: This server is Raft leader for term 1. Latest log index is 0.
+2386-05-06T22:45:38.105206100 1.046135s info: Table 948312c9-43d0-47e8-a3f6-be7223781d4e: Starting a new Raft election for term 1.
+2386-05-06T22:45:38.105722000 1.046535s info: Table 948312c9-43d0-47e8-a3f6-be7223781d4e: Added replica on this server.
+2386-05-06T22:45:38.109207700 1.049896s info: Table 948312c9-43d0-47e8-a3f6-be7223781d4e: This server is Raft leader for term 1. Latest log index is 0.
+2386-05-06T22:45:52.051255100 14.991933s notice: Server got Control-C; shutting down...
+2386-05-06T22:46:45.194081000 0.016176s notice: Running rethinkdb 2.3.2-windows-beta (MSC 190023506)...
+2386-05-06T22:46:45.194081001 0.016367s notice: Running on 6.2.9200 (Windows 8, Server 2012)
+2386-05-06T22:46:45.194081002 0.016392s notice: Loading data from directory C:\\Users\\Gregory\\Projects\\personal\\view\\rethinkdb_data
+2386-05-06T22:46:45.203085800 0.025416s info: Cache size is set to 200 MB
+2386-05-06T22:46:45.205599300 0.027656s notice: Listening for intracluster connections on port 56708
+2386-05-06T22:46:45.237108200 0.059238s notice: Listening for client driver connections on port 56709
+2386-05-06T22:46:45.237609100 0.059716s notice: Listening for administrative HTTP connections on port 56710
+2386-05-06T22:46:45.237609101 0.059830s notice: Listening on cluster address: 127.0.0.1
+2386-05-06T22:46:45.237609102 0.059834s notice: Listening on driver address: 127.0.0.1
+2386-05-06T22:46:45.237609103 0.059838s notice: Listening on http address: 127.0.0.1
+2386-05-06T22:46:45.237609104 0.059841s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2386-05-06T22:46:45.237609105 0.059845s notice: Server ready, "RZB_US_SF_180_0cd" 5a54d3cc-9525-43e8-822b-92419689bc3d
+2386-05-06T22:46:46.524928800 1.346922s info: Table 948312c9-43d0-47e8-a3f6-be7223781d4e: Starting a new Raft election for term 2.
+2386-05-06T22:46:46.527430800 1.349731s info: Table 948312c9-43d0-47e8-a3f6-be7223781d4e: This server is Raft leader for term 2. Latest log index is 5.
+2386-05-06T22:46:46.696449300 1.518446s info: Table d77cb560-c7b8-40ba-b11c-c522ac4a6e4e: Starting a new Raft election for term 2.
+2386-05-06T22:46:46.699536000 1.521570s info: Table d77cb560-c7b8-40ba-b11c-c522ac4a6e4e: This server is Raft leader for term 2. Latest log index is 5.
+2386-05-06T22:46:46.967199000 1.789340s info: Table 3680e0e5-d1e8-4fc1-9825-e4d580d67d39: Starting a new Raft election for term 2.
+2386-05-06T22:46:46.974960700 1.796823s info: Table 3680e0e5-d1e8-4fc1-9825-e4d580d67d39: This server is Raft leader for term 2. Latest log index is 4.
+2386-05-06T22:46:46.986537100 1.808628s info: Table 4631bd7a-32da-4b70-9491-5307989ab8db: Starting a new Raft election for term 2.
+2386-05-06T22:46:47.002062900 1.824343s info: Table 4631bd7a-32da-4b70-9491-5307989ab8db: This server is Raft leader for term 2. Latest log index is 4.
+2386-05-06T22:47:24.978861000 39.800693s notice: Server got Control-C; shutting down...
+2386-05-06T22:47:24.979361100 39.800989s notice: Shutting down client connections...
