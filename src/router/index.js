@@ -12,7 +12,7 @@ export default new Router({
       component: require('@/components/Home')
     },
     {
-      path: '/room/:roomId',
+      path: '/room/:roomId?',
       name: 'room',
       component: require('@/components/Room')
     },

@@ -11,9 +11,13 @@
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
-  * { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  html, body { font-family: 'Open Sans', sans-serif; }
+html, body { font-family: 'Open Sans', sans-serif; }
 </style>
