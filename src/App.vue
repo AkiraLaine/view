@@ -13,7 +13,11 @@
       }
     },
     mounted () {
-      this.userId = window.localStorage.getItem('userId') || ((((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1) + (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1))
+      this.userId = window.localStorage.getItem('userId')
+      if (!this.userId) {
+        const uuid = ((((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1) + (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1))
+        window.localStorage.setItem('userId', uuid)
+      }
     }
   }
 </script>
