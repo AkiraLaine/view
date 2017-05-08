@@ -49,6 +49,18 @@
         player: null
       }
     },
+    watch: {
+      'room': function () {
+        if (Object.keys(this.room).length > 0) {
+          if (this.room.viewers.indexOf(this.userId) === -1) {
+            this.$$rooms.update({
+              id: this.$route.params.roomId,
+              viewers: [...this.room.viewers, this.userId]
+            })
+          }
+        }
+      }
+    },
     methods: {
       subscribeToRoom () {
         if (!this.$route.params.roomId) {
