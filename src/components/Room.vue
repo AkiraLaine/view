@@ -96,15 +96,16 @@
             .subscribe(() => {
               this.$router.push({ path: `/room/${room.id}` })
               this.room = room
+              this.watchRoom()
             })
-        } else {
-          // load room
-          this.$$rooms.find({ id: this.$route.params.roomId })
-            .watch()
-            .subscribe(room => {
-              this.room = room
-            })
-        }
+        } else this.watchRoom()
+      },
+      watchRoom () {
+        this.$$rooms.find({ id: this.$route.params.roomId })
+          .watch()
+          .subscribe(room => {
+            this.room = room
+          })
       },
       handleStateChange (event) {
         if (event.data === YT.PlayerState.PLAYING) { // eslint-disable-line
