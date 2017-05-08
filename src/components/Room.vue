@@ -58,7 +58,8 @@
     data () {
       return {
         room: {},
-        player: {}
+        player: {},
+        durationInterval: null
       }
     },
     watch: {
@@ -70,7 +71,7 @@
           })
         }
       },
-      'room.video': function () {
+      'room.video.status': function () {
         if (Object.keys(this.player).length && this.player.playVideo) {
           if (this.room.video.status === 'playing') {
             this.player.playVideo()
@@ -106,12 +107,26 @@
         const io = socket.connect('http://localhost:3000')
         io.emit('join-room', { room: this.$route.params.roomId, userId: this.userId })
         this.$$rooms.find({ id: this.$route.params.roomId })
+          .fetch()
+          .subscribe(room => {
+            if (room.video.currentTime > 0) {
+              let interval = setInterval(() => {
+                if (this.player.playVideo) {
+                  clearInterval(interval)
+                  this.player.seekTo(room.video.currentTime)
+                  if (room.video.status === 'paused') this.player.pauseVideo()
+                }
+              }, 100)
+            }
+          })
+        this.$$rooms.find({ id: this.$route.params.roomId })
           .watch()
           .subscribe(room => {
             this.room = room
           })
       },
       handleStateChange (event) {
+        // this.player.seekTo(this.room.video.currentTime)
         if (event.data === YT.PlayerState.PLAYING) { // eslint-disable-line
           this.$$rooms.update({
             id: this.$route.params.roomId,
@@ -119,7 +134,17 @@
               status: 'playing'
             }
           })
+          this.durationInterval = setInterval(() => {
+            console.log('update')
+            this.$$rooms.update({
+              id: this.$route.params.roomId,
+              video: {
+                currentTime: this.player.getCurrentTime()
+              }
+            })
+          }, 1000)
         } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
+          clearInterval(this.durationInterval)
           this.$$rooms.update({
             id: this.$route.params.roomId,
             video: {
