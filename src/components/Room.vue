@@ -42,6 +42,15 @@
           videoId: this.room.player.videoId
         })
       }
+
+      window.addEventListener('unload', () => {
+        let viewerIndex = this.room.viewers.indexOf(this.userId)
+        this.room.viewers.splice(viewerIndex)
+        this.$$rooms.update({
+          id: this.$route.params.roomId,
+          viewers: this.room.viewers
+        })
+      })
     },
     data () {
       return {
