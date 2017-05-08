@@ -18,6 +18,8 @@
 </template>
 
 <script>
+  import socket from 'socket.io-client'
+
   export default {
     name: 'room',
     props: {
@@ -42,7 +44,7 @@
         })
       }
 
-      window.addEventListener('unload', () => {
+      window.onunload = () => {
         if (Object.keys(this.room).length > 0) {
           let viewerIndex = this.room.viewers.indexOf(this.userId)
           this.room.viewers.splice(viewerIndex, 1)
@@ -51,7 +53,7 @@
             viewers: this.room.viewers
           })
         }
-      })
+      }
     },
     data () {
       return {
@@ -101,6 +103,8 @@
         } else this.watchRoom()
       },
       watchRoom () {
+        const io = socket.connect('http://localhost:3000')
+        io.emit('join-room', { room: this.$route.params.roomId, userId: this.userId })
         this.$$rooms.find({ id: this.$route.params.roomId })
           .watch()
           .subscribe(room => {
