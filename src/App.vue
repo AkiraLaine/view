@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view :userId='userId'></router-view>
   </div>
 </template>
 
@@ -12,10 +12,11 @@
         userId: null
       }
     },
-    mounted () {
+    created () {
       this.userId = window.localStorage.getItem('userId')
       if (!this.userId) {
         const uuid = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1)
+        this.userId = uuid
         window.localStorage.setItem('userId', uuid)
       }
     }

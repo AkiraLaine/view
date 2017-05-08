@@ -20,6 +20,9 @@
 <script>
   export default {
     name: 'room',
+    props: {
+      userId: String
+    },
     beforeRouteUpdate (to, from, next) {
       next()
       this.subscribeToRoom()
@@ -52,7 +55,7 @@
           // create room
           this.$$rooms.insert({
             id: Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1),
-            viewers: [this.$root.userId],
+            viewers: [this.userId],
             playlist: [],
             player: {
               status: 'paused',
