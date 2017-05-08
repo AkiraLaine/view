@@ -4,7 +4,7 @@
       <div class='top-section'>
         <h4 class='logo'>View</h4>
         <span class='link'>https://view.now.sh/room/123456</span>
-        <span class='views'>7 Watching</span>
+        <span class='views' v-if='Object.keys(room).length > 0'>{{ room.viewers.length }} Watching</span>
       </div>
       <div class='player' id="player"></div>
     </div>
@@ -23,10 +23,6 @@
     props: {
       userId: String
     },
-    beforeRouteUpdate (to, from, next) {
-      next()
-      this.subscribeToRoom()
-    },
     mounted () {
       this.subscribeToRoom()
 
@@ -39,33 +35,45 @@
         this.player = new YT.Player('player', { // eslint-disable-line
           height: '430',
           width: '710',
-          videoId: this.room.player.videoId
+          videoId: this.room.video.id,
+          events: {
+            onStateChange: this.handleStateChange
+          }
         })
       }
 
       window.addEventListener('unload', () => {
-        let viewerIndex = this.room.viewers.indexOf(this.userId)
-        this.room.viewers.splice(viewerIndex)
-        this.$$rooms.update({
-          id: this.$route.params.roomId,
-          viewers: this.room.viewers
-        })
+        if (Object.keys(this.room).length > 0) {
+          let viewerIndex = this.room.viewers.indexOf(this.userId)
+          this.room.viewers.splice(viewerIndex, 1)
+          this.$$rooms.update({
+            id: this.$route.params.roomId,
+            viewers: this.room.viewers
+          })
+        }
       })
     },
     data () {
       return {
         room: {},
-        player: null
+        player: {}
       }
     },
     watch: {
-      'room': function () {
-        if (Object.keys(this.room).length > 0) {
-          if (this.room.viewers.indexOf(this.userId) === -1) {
-            this.$$rooms.update({
-              id: this.$route.params.roomId,
-              viewers: [...this.room.viewers, this.userId]
-            })
+      'room.viewers': function () {
+        if (this.room.viewers.indexOf(this.userId) === -1) {
+          this.$$rooms.update({
+            id: this.$route.params.roomId,
+            viewers: [...this.room.viewers, this.userId]
+          })
+        }
+      },
+      'room.video': function () {
+        if (Object.keys(this.player).length && this.player.playVideo) {
+          if (this.room.video.status === 'playing') {
+            this.player.playVideo()
+          } else if (this.room.video.status === 'paused') {
+            this.player.pauseVideo()
           }
         }
       }
@@ -74,20 +82,21 @@
       subscribeToRoom () {
         if (!this.$route.params.roomId) {
           // create room
-          this.$$rooms.insert({
+          const room = {
             id: Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1),
             viewers: [this.userId],
             playlist: [],
-            player: {
+            video: {
               status: 'paused',
-              videoId: 'CZlfbep2LdU',
-              time: 0
+              id: 'CZlfbep2LdU',
+              currentTime: 0
             }
-          }).subscribe(
-            ({ id }) => {
-              this.$router.push({ path: `/room/${id}` })
-            }
-          )
+          }
+          this.$$rooms.insert(room)
+            .subscribe(() => {
+              this.$router.push({ path: `/room/${room.id}` })
+              this.room = room
+            })
         } else {
           // load room
           this.$$rooms.find({ id: this.$route.params.roomId })
@@ -95,6 +104,23 @@
             .subscribe(room => {
               this.room = room
             })
+        }
+      },
+      handleStateChange (event) {
+        if (event.data === YT.PlayerState.PLAYING) { // eslint-disable-line
+          this.$$rooms.update({
+            id: this.$route.params.roomId,
+            video: {
+              status: 'playing'
+            }
+          })
+        } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
+          this.$$rooms.update({
+            id: this.$route.params.roomId,
+            video: {
+              status: 'paused'
+            }
+          })
         }
       }
     }
