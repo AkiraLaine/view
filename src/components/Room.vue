@@ -6,7 +6,7 @@
         <span class='link'>https://view.now.sh/room/123456</span>
         <span class='views'>7 Watching</span>
       </div>
-      <div class='video-container'></div>
+      <div class='player' id="player"></div>
     </div>
     <div class='column-1'>
       <div class="top-section">
@@ -20,12 +20,31 @@
 <script>
   export default {
     name: 'room',
-    mounted () {
-      this.subscribeToRoom()
-    },
     beforeRouteUpdate (to, from, next) {
       next()
       this.subscribeToRoom()
+    },
+    mounted () {
+      this.subscribeToRoom()
+
+      let tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      let firstScriptTag = document.getElementsByTagName('script')[0]
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+
+      window.onYouTubeIframeAPIReady = () => { // eslint-disable-line
+        this.player = new YT.Player('player', { // eslint-disable-line
+          height: '430',
+          width: '710',
+          videoId: this.room.player.videoId
+        })
+      }
+    },
+    data () {
+      return {
+        room: {},
+        player: null
+      }
     },
     methods: {
       subscribeToRoom () {
@@ -37,7 +56,7 @@
             playlist: [],
             player: {
               status: 'paused',
-              currentVideo: '',
+              videoId: 'CZlfbep2LdU',
               time: 0
             }
           }).subscribe(
@@ -53,11 +72,6 @@
               this.room = room
             })
         }
-      }
-    },
-    data () {
-      return {
-        room: {}
       }
     }
   }
@@ -83,7 +97,7 @@
 .column-2 {
   display: flex;
   flex-direction: column;
-  width: 800px;
+  width: 730px;
   height: 100%;
   /*background-color: #ccc;*/
   padding: 10px;
@@ -113,10 +127,7 @@
   color: #E35D5B;
   margin-left: auto;
 }
-.video-container {
-  width: 100%;
-  height: 430px;
-  background-color: #999;
+.player {
   box-shadow: 7px 7px 20px rgba(0,0,0,0.5);
 }
 .search {
