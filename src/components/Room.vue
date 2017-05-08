@@ -3,7 +3,7 @@
     <div class='column-2'>
       <div class='top-section'>
         <h4 class='logo'>View</h4>
-        <span class='link'>https://view.now.sh/room/123456</span>
+        <span class='link'>{{ url }}</span>
         <span class='views' v-if='Object.keys(room).length > 0'>{{ room.viewers.length }} Watching</span>
       </div>
       <div class='player' id="player"></div>
@@ -151,6 +151,13 @@
               status: 'paused'
             }
           })
+        }
+      }
+    },
+    computed: {
+      url () {
+        if (this.$route.params.roomId) {
+          return window.location.href
         }
       }
     }
