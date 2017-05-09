@@ -43,17 +43,6 @@
           }
         })
       }
-
-      window.onunload = () => {
-        if (Object.keys(this.room).length > 0) {
-          let viewerIndex = this.room.viewers.indexOf(this.userId)
-          this.room.viewers.splice(viewerIndex, 1)
-          this.$$rooms.update({
-            id: this.$route.params.roomId,
-            viewers: this.room.viewers
-          })
-        }
-      }
     },
     data () {
       return {
