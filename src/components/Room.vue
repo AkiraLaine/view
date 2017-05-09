@@ -19,21 +19,23 @@
 
 <script>
   import socket from 'socket.io-client'
+  const io = socket.connect('http://localhost:3000')
 
   export default {
     name: 'room',
     props: {
       userId: String
     },
-    mounted () {
+    created () {
       this.subscribeToRoom()
-
-      let tag = document.createElement('script')
+    },
+    mounted () {
+      var tag = document.createElement('script')
       tag.src = 'https://www.youtube.com/iframe_api'
-      let firstScriptTag = document.getElementsByTagName('script')[0]
+      var firstScriptTag = document.getElementsByTagName('script')[0]
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
 
-      window.onYouTubeIframeAPIReady = () => { // eslint-disable-line
+      window.onYouTubeIframeAPIReady = () => {
         this.player = new YT.Player('player', { // eslint-disable-line
           height: '430',
           width: '710',
@@ -47,21 +49,12 @@
     data () {
       return {
         room: {},
-        player: {},
-        durationInterval: null
+        player: {}
       }
     },
     watch: {
-      'room.viewers': function () {
-        if (this.room.viewers.indexOf(this.userId) === -1) {
-          this.$$rooms.update({
-            id: this.$route.params.roomId,
-            viewers: [...this.room.viewers, this.userId]
-          })
-        }
-      },
       'room.video.status': function () {
-        if (Object.keys(this.player).length && this.player.playVideo) {
+        if (Object.keys(this.player).length > 0 && this.player.playVideo) {
           if (this.room.video.status === 'playing') {
             this.player.playVideo()
           } else if (this.room.video.status === 'paused') {
@@ -93,53 +86,37 @@
         } else this.watchRoom()
       },
       watchRoom () {
-        const io = socket.connect('http://localhost:3000')
-        io.emit('join-room', { room: this.$route.params.roomId, userId: this.userId })
-        this.$$rooms.find({ id: this.$route.params.roomId })
-          .fetch()
-          .subscribe(room => {
-            if (room.video.currentTime > 0) {
-              let interval = setInterval(() => {
-                if (this.player.playVideo) {
-                  clearInterval(interval)
-                  this.player.seekTo(room.video.currentTime)
-                  if (room.video.status === 'paused') this.player.pauseVideo()
-                }
-              }, 100)
-            }
-          })
+        io.emit('join-room', { roomId: this.$route.params.roomId, userId: this.userId })
         this.$$rooms.find({ id: this.$route.params.roomId })
           .watch()
           .subscribe(room => {
             this.room = room
           })
+        this.getInitialVideoState()
+      },
+      getInitialVideoState () {
+        let checkIfEverythingReady = setInterval(() => {
+          if (Object.keys(this.room).length > 0 && Object.keys(this.player).length > 0 && this.player.playVideo) {
+            clearInterval(checkIfEverythingReady)
+            if (this.room.video.status === 'playing') {
+              if (this.room.video.currentTime > 0) {
+                this.player.seekTo(this.room.video.currentTime)
+              }
+              this.player.playVideo()
+            } else {
+              if (this.room.video.currentTime > 0) {
+                this.player.seekTo(this.room.video.currentTime)
+              }
+              this.player.pauseVideo()
+            }
+          }
+        }, 100)
       },
       handleStateChange (event) {
-        // this.player.seekTo(this.room.video.currentTime)
         if (event.data === YT.PlayerState.PLAYING) { // eslint-disable-line
-          this.$$rooms.update({
-            id: this.$route.params.roomId,
-            video: {
-              status: 'playing'
-            }
-          })
-          this.durationInterval = setInterval(() => {
-            console.log('update')
-            this.$$rooms.update({
-              id: this.$route.params.roomId,
-              video: {
-                currentTime: this.player.getCurrentTime()
-              }
-            })
-          }, 1000)
+          io.emit('updatePlayerState', 'playing')
         } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
-          clearInterval(this.durationInterval)
-          this.$$rooms.update({
-            id: this.$route.params.roomId,
-            video: {
-              status: 'paused'
-            }
-          })
+          io.emit('updatePlayerState', 'paused')
         }
       }
     },
