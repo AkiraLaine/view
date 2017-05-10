@@ -64,6 +64,10 @@ io.on('connection', socket => {
     }
   })
 
+  socket.on('updateCurrentTime', time => {
+    roomData[userData.roomId].time = time
+  })
+
   socket.on('disconnect', () => {
     rooms.find(userData.roomId).fetch().subscribe(room => {
       let viewerIndex = room.viewers.indexOf(userData.userId)

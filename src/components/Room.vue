@@ -45,11 +45,14 @@
           }
         })
       }
+
+      this.checkSeekEvent()
     },
     data () {
       return {
         room: {},
-        player: {}
+        player: {},
+        seekInterval: null
       }
     },
     watch: {
@@ -59,6 +62,13 @@
             this.player.playVideo()
           } else if (this.room.video.status === 'paused') {
             this.player.pauseVideo()
+          }
+        }
+      },
+      'room.video.currentTime': function (curr, prev) {
+        if (Object.keys(this.player).length > 0 && this.player.seekTo) {
+          if (curr > prev + 3 || curr < prev - 3) {
+            this.player.seekTo(curr)
           }
         }
       }
@@ -118,6 +128,19 @@
         } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
           io.emit('updatePlayerState', 'paused')
         }
+      },
+      checkSeekEvent () {
+        let lastCurrentTime = -1
+
+        this.seekInterval = setInterval(() => {
+          if (lastCurrentTime !== -1) {
+            const currentTime = this.player.getCurrentTime()
+            if (Math.abs(currentTime - lastCurrentTime) > 3) {
+              io.emit('updateCurrentTime', currentTime)
+            }
+            lastCurrentTime = currentTime
+          } else lastCurrentTime = this.player.getCurrentTime()
+        }, 1000)
       }
     },
     computed: {
