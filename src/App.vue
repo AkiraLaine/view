@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view :userId='userId'></router-view>
+    <transition name='slide'>
+      <router-view :userId='userId'></router-view>
+    </transition>
   </div>
 </template>
 
@@ -34,5 +36,13 @@
 
 html, body { 
   font-family: 'Open Sans', sans-serif;
+  overflow: hidden;
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: all 0.5s ease
+}
+.slide-leave-to {
+  transform: translateX(-100%);
 }
 </style>
