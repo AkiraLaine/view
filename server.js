@@ -73,10 +73,15 @@ io.on('connection', socket => {
       let viewerIndex = room.viewers.indexOf(userData.userId)
       room.viewers.splice(viewerIndex, 1)
 
-      rooms.update({
-        id: userData.roomId,
-        viewers: room.viewers
-      })
+      if (room.viewers.length === 0) {
+        rooms.remove(userData.roomId)
+        delete roomData[userData.roomId]
+      } else {
+        rooms.update({
+          id: userData.roomId,
+          viewers: room.viewers
+        })
+      }
     })
   })
 })
