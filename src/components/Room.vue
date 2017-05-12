@@ -40,6 +40,9 @@
           height: '430',
           width: '710',
           videoId: this.room.video.id,
+          playerVars: {
+            rel: 0
+          },
           events: {
             onStateChange: this.handleStateChange
           }
