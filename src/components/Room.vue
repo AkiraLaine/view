@@ -10,7 +10,7 @@
     </div>
     <div class='column-1'>
       <div class="top-section">
-        <input type="text" placeholder="Search for a video or paste a link..." class='search'>
+        <input type="text" v-model='query' @keydown.enter='loadVideo()' placeholder="Search for a video or paste a link..." class='search'>
       </div>
       <div class='container'></div>
     </div>
@@ -52,7 +52,8 @@
       return {
         room: {},
         player: {},
-        seekInterval: null
+        seekInterval: null,
+        query: ''
       }
     },
     watch: {
@@ -70,6 +71,11 @@
           if (curr > prev + 3 || curr < prev - 3) {
             this.player.seekTo(curr)
           }
+        }
+      },
+      'room.video.id': function (curr, prev) {
+        if (curr !== prev && Object.keys(this.player).length > 0 && this.player.loadVideoById) {
+          this.player.loadVideoById(curr)
         }
       }
     },
@@ -132,15 +138,35 @@
       checkSeekEvent () {
         let lastCurrentTime = -1
 
-        this.seekInterval = setInterval(() => {
-          if (lastCurrentTime !== -1) {
-            const currentTime = this.player.getCurrentTime()
-            if (Math.abs(currentTime - lastCurrentTime) > 3) {
-              io.emit('updateCurrentTime', currentTime)
+        let checkIfEverythingReady = setInterval(() => {
+          if (Object.keys(this.player).length > 0 && this.player.getCurrentTime) {
+            clearInterval(checkIfEverythingReady)
+            this.seekInterval = setInterval(() => {
+              if (lastCurrentTime !== -1) {
+                const currentTime = this.player.getCurrentTime()
+                if (Math.abs(currentTime - lastCurrentTime) > 3) {
+                  io.emit('updateCurrentTime', currentTime)
+                }
+                lastCurrentTime = currentTime
+              } else lastCurrentTime = this.player.getCurrentTime()
+            }, 1000)
+          }
+        }, 100)
+      },
+      loadVideo () {
+        if (this.query.indexOf('youtube') > -1) {
+          const id = this.query.split('=')[1]
+          io.emit('resetRoomData')
+          this.player.loadVideoById(id)
+          this.$$rooms.update({
+            id: this.$route.params.roomId,
+            video: {
+              id
             }
-            lastCurrentTime = currentTime
-          } else lastCurrentTime = this.player.getCurrentTime()
-        }, 1000)
+          })
+          this.query = ''
+          io.emit('updatePlayerState', 'playing')
+        }
       }
     },
     computed: {

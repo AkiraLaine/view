@@ -52,7 +52,7 @@ io.on('connection', socket => {
         }, 1000)
       }
 
-    }  else if (state === 'paused') {
+    } else if (state === 'paused') {
       clearInterval(roomData[userData.roomId].interval)
       roomData[userData.roomId].playing = false
       rooms.update({
@@ -66,6 +66,15 @@ io.on('connection', socket => {
 
   socket.on('updateCurrentTime', time => {
     roomData[userData.roomId].time = time
+  })
+
+  socket.on('resetRoomData', () => {
+    clearInterval(roomData[userData.roomId].interval)
+    roomData[userData.roomId] = {
+      time: 0,
+      interval: null,
+      playing: false
+    }
   })
 
   socket.on('disconnect', () => {
