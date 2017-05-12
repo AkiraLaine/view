@@ -3,7 +3,10 @@
     <div class='column-2'>
       <div class='top-section'>
         <h4 class='logo'>View</h4>
-        <span class='link'>{{ url }}</span>
+        <span class='link' :data-clipboard-text='url'>
+          {{ url }}
+          <div class='copied' ref='copied'></div>
+        </span>
         <span class='views' v-if='Object.keys(room).length > 0'>{{ room.viewers.length }} Watching</span>
       </div>
       <div class='player' id="player"></div>
@@ -20,6 +23,7 @@
 <script>
   import socket from 'socket.io-client'
   const io = socket.connect('http://localhost:3000')
+  import Clipboard from 'clipboard'
 
   export default {
     name: 'room',
@@ -48,6 +52,16 @@
           }
         })
       }
+
+      const clipboard = new Clipboard('.link') // eslint-disable-line
+      clipboard.on('success', e => {
+        this.$refs.copied.classList.add('show')
+        setTimeout(() => {
+          this.$refs.copied.classList.remove('show')
+        }, 3000)
+
+        e.clearSelection()
+      })
 
       this.checkSeekEvent()
     },
@@ -226,6 +240,35 @@
   color: #E35D5B;
   border-bottom: 1px solid #E35D5B;
   cursor: pointer;
+  font-size: 0.9em;
+  position: relative;
+}
+.copied {
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.copied.show {
+  opacity: 1;
+}
+.copied.show::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  background: #E35D5B;
+  top: -13px;
+  right: 46%;
+  transform: rotate(45deg);
+}
+.copied.show::after {
+  content: 'Copied!';
+  position: absolute;
+  padding: 5px;
+  top: -35px;
+  right: 37%;
+  color: #fff;
+  background: #E35D5B;
+  border-radius: 5px;
   font-size: 0.9em;
 }
 .views {
