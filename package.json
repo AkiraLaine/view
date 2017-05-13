@@ -15,6 +15,7 @@
   "dependencies": {
     "@horizon/client": "^2.0.0",
     "clipboard": "^1.6.1",
+    "query-string": "^4.3.4",
     "socket.io": "^1.7.4",
     "socket.io-client": "^1.7.4",
     "vue": "^2.2.6",

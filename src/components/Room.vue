@@ -15,15 +15,24 @@
       <div class="top-section">
         <input type="text" v-model='query' @keydown.enter='loadVideo()' placeholder="Search for a video or paste a link..." class='search'>
       </div>
-      <div class='container'></div>
+      <div class='container' ref='container'>
+        <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index'>
+          <img :src="item.snippet.thumbnails.medium.url">
+          <div style="margin-left:10px">
+            <div class='title'>{{ item.snippet.title }}</div>
+            <div class='channel'>{{ item.snippet.channelTitle }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+  import Clipboard from 'clipboard'
+  import queryString from 'query-string'
   import socket from 'socket.io-client'
   const io = socket.connect('http://localhost:3000')
-  import Clipboard from 'clipboard'
 
   export default {
     name: 'room',
@@ -70,7 +79,8 @@
         room: {},
         player: {},
         seekInterval: null,
-        query: ''
+        query: '',
+        results: []
       }
     },
     watch: {
@@ -183,6 +193,21 @@
           })
           this.query = ''
           io.emit('updatePlayerState', 'playing')
+        } else {
+          const params = {
+            part: 'snippet',
+            q: this.query,
+            key: require('@/keys').YOUTUBE_API_KEY,
+            type: 'video',
+            maxResults: 10
+          }
+          fetch(`https://www.googleapis.com/youtube/v3/search?${queryString.stringify(params)}`)
+            .then(response => {
+              response.json()
+                .then(data => {
+                  this.results = data.items
+                })
+            })
         }
       }
     },
@@ -196,7 +221,7 @@
   }
 </script>
 
-<style>
+<style scoped>
 .wrapper {
   background-color: #f6f6f6;
   width: 100vw;
@@ -296,5 +321,40 @@
 .container {
   height: 430px;
   background-color: #fff;
+  overflow-y: hidden;
+}
+.item {
+  display: flex;
+  align-items: center;
+}
+.item img {
+  width: 168px;
+  height: 94px;
+}
+.item .title {
+  max-width: 200px;
+  font-size: 0.9em;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item .channel {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.container:hover {
+  overflow: auto;
+}
+.container::-webkit-scrollbar {
+  width: 7px;
+}
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.container::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 10px;
 }
 </style>
