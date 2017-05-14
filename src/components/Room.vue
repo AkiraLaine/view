@@ -58,7 +58,8 @@
   import Clipboard from 'clipboard'
   import queryString from 'query-string'
   import socket from 'socket.io-client'
-  const io = socket.connect('http://localhost:3000')
+  const URL = process.env.NODE_ENV === 'production' ? 'http://104.131.108.12' : 'http://localhost:3000'
+  const io = socket.connect(URL)
 
   export default {
     name: 'room',
