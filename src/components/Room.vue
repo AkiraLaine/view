@@ -12,9 +12,22 @@
     <div class="container">
       <div class='player' id="player"></div>
       <div class='sidecard'>
-        <div class='no-queue' v-if='Object.keys(room).length > 0 && !room.playlist.length'>
+        <div class='no-queue' v-if='Object.keys(room).length > 0 && !room.queue.length'>
           <div class='info'>There are currently no queued videos</div>
           <button class='button accent' @click='searchIsActive = true'>Search for videos</button>
+        </div>
+        <div style='height:430px;position:relative' v-else-if='Object.keys(room).length > 0 && room.queue.length'>
+          <div class="info" style="margin-bottom:0">Queue</div>
+          <img @click='searchIsActive = true' style="cursor:pointer;width:20px;position:absolute;top:3px;right:10px;" src="../assets/search.png">
+          <div class='result-container' style="height:100%;padding-bottom:25px">
+            <div class="item" v-for='(item, index) in queue' v-if='queue.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
+              <img :src="item.snippet.thumbnails.medium.url">
+              <div style="display:flex;flex-direction:column;margin-left:10px">
+                <div class='title'>{{ item.snippet.title }}</div>
+                <div class='channel'>{{ item.snippet.channelTitle }}</div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class='search-container' :class='{"slide": searchIsActive}'>
           <div class='input-container'>
@@ -27,6 +40,7 @@
               <div style="display:flex;flex-direction:column;margin-left:10px">
                 <div class='title'>{{ item.snippet.title }}</div>
                 <div class='channel'>{{ item.snippet.channelTitle }}</div>
+                <span class="queue" @click.stop='addVideoToQueue(item)'>+ Add to queue</span>
               </div>
             </div>
           </div>
@@ -122,7 +136,7 @@
           const room = {
             id: Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1),
             viewers: [this.userId],
-            playlist: [],
+            queue: [],
             video: {
               status: 'paused',
               id: 'CZlfbep2LdU',
@@ -169,6 +183,15 @@
           io.emit('updatePlayerState', 'playing')
         } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
           io.emit('updatePlayerState', 'paused')
+        } else if (event.data === YT.PlayerState.ENDED) { // eslint-disable-line
+          if (Object.keys(this.room).length > 0 && this.room.queue.length > 0) {
+            const nextVideo = this.room.queue.splice(0, 1)[0]
+            this.loadVideo(nextVideo.id.videoId)
+            this.$$rooms.update({
+              id: this.$route.params.roomId,
+              queue: this.room.queue
+            })
+          }
         }
       },
       checkSeekEvent () {
@@ -221,12 +244,25 @@
         })
         this.query = ''
         io.emit('updatePlayerState', 'playing')
+      },
+      addVideoToQueue (item) {
+        let queue = this.room.queue
+        queue.push(item)
+        this.$$rooms.update({
+          id: this.$route.params.roomId,
+          queue
+        })
       }
     },
     computed: {
       url () {
         if (this.$route.params.roomId) {
           return window.location.href
+        }
+      },
+      queue () {
+        if (Object.keys(this.room).length > 0) {
+          return this.room.queue
         }
       }
     }
@@ -303,7 +339,7 @@
   align-items: center;
   padding: 10px;
 }
-.no-queue .info {
+.info {
   font-weight: 600;
   font-size: 1.2em;
   color: #ccc;
@@ -394,6 +430,13 @@
   font-size: 0.7em;
   text-transform: uppercase;
   max-width: 200px;
+}
+.item .queue {
+  font-size: 0.7em;
+  color: #E35D5B;
+}
+.item .queue:hover {
+  text-decoration: underline;
 }
 .copied {
   opacity: 0;
