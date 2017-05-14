@@ -1,6 +1,39 @@
 <template>
   <div class='wrapper'>
-    <div class='column-2'>
+    <div class='navbar'>
+      <div class="navbar-container">
+        <h4 class='logo'>View</h4>
+        <button class='button link' style="margin-left:auto" :data-clipboard-text='url'>
+          Copy URL
+          <div class='copied' ref='copied'></div>
+        </button>
+      </div>
+    </div>
+    <div class="container">
+      <div class='player' id="player"></div>
+      <div class='sidecard'>
+        <div class='no-queue' v-if='Object.keys(room).length > 0 && !room.playlist.length && !searchIsActive'>
+          <div class='info'>There are currently no queued videos</div>
+          <button class='button accent' @click='searchIsActive = true'>Search for videos</button>
+        </div>
+        <div v-else-if='searchIsActive'>
+          <div class='search-container'>
+            <input type="text" class='search' v-model='query' @keydown.enter='search()' placeholder="Search for a video or paste a URL...">
+            <div class='close'>&#x2715;</div>
+          </div>
+          <div class='result-container'>
+            <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
+              <img :src="item.snippet.thumbnails.medium.url">
+              <div style="margin-left:10px">
+                <div class='title'>{{ item.snippet.title }}</div>
+                <div class='channel'>{{ item.snippet.channelTitle }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class='column-2'>
       <div class='top-section'>
         <h4 class='logo'>View</h4>
         <span class='link' :data-clipboard-text='url'>
@@ -24,7 +57,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -80,7 +113,8 @@
         player: {},
         seekInterval: null,
         query: '',
-        results: []
+        results: [],
+        searchIsActive: false
       }
     },
     watch: {
@@ -229,90 +263,88 @@
   background-color: #f6f6f6;
   width: 100vw;
   height: 100vh;
-  padding: 2em;
-  display: flex;
-  justify-content: space-around;
 }
-.column-1 {
-  width: 33%;
-  height: 100%;
-  /*background-color: #666;*/
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-}
-.column-2 {
-  display: flex;
-  flex-direction: column;
-  width: 730px;
-  height: 100%;
-  /*background-color: #ccc;*/
-  padding: 10px;
-}
-.top-section {
+.navbar {
   width: 100%;
+  height: 80px;  
+  background-color: #E35D5B;
+}
+.navbar-container {
+  height: 80px;
+  width: 80%;
   display: flex;
-  align-items: baseline;
-  margin-bottom: 10px;
-  min-height: 45px;
-  max-height: 45px;
+  align-items: center;
+  margin: 0 auto;
 }
 .logo {
   font-weight: 300;
-  font-size: 2em;
+  font-size: 1.5em;
   letter-spacing: 2px;
-  color: #E35D5B;
+  color: #fff;
 }
-.link {
-  margin-left: 10px;
-  color: #E35D5B;
-  border-bottom: 1px solid #E35D5B;
+.button {
+  background: none;
+  border: none;
+  outline: none;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 10px 20px;
   cursor: pointer;
-  font-size: 0.9em;
+  transition: all 0.3s ease;
   position: relative;
 }
-.copied {
-  opacity: 0;
-  transition: all 0.3s ease;
+.button:hover {
+  background: rgba(255,255,255,0.1)
 }
-.copied.show {
-  opacity: 1;
-}
-.copied.show::before {
-  content: '';
-  width: 10px;
-  height: 10px;
-  position: absolute;
-  background: #E35D5B;
-  top: -13px;
-  right: 46%;
-  transform: rotate(45deg);
-}
-.copied.show::after {
-  content: 'Copied!';
-  position: absolute;
-  padding: 5px;
-  top: -35px;
-  right: 37%;
-  color: #fff;
-  background: #E35D5B;
-  border-radius: 5px;
-  font-size: 0.9em;
-}
-.views {
+.button.accent {
+  border: 1px solid #E35D5B;
   color: #E35D5B;
-  margin-left: auto;
 }
-.player {
-  box-shadow: 7px 7px 20px rgba(0,0,0,0.5);
+.button.accent:hover {
+  background: #E35D5B;
+  color: #fff;
+}
+.container {
+  margin: 0 auto;
+  width: 80%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 40px; 
+}
+.sidecard {
+  width: 400px;
+  height: 430px;
+  background-color: #fff;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.3);
+}
+.no-queue {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.no-queue .info {
+  font-weight: 600;
+  font-size: 1.2em;
+  color: #ccc;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.search-container {
+  display: flex;
 }
 .search {
   background: none;
   outline: none;
   border: none;
-  border-bottom: 1px solid #E35D5B;
+  border-bottom: 2px solid #E35D5B;
   width: 100%;
-  padding: 10px;
+  padding: 13px;
   font-size: 0.9em;
   color: #E35D5B;
   box-sizing: border-box;
@@ -321,10 +353,34 @@
   color: #E35D5B;
   opacity: 0.7;
 }
-.container {
-  height: 430px;
-  background-color: #fff;
+.close {
+  min-width: 45px;
+  min-height: 45px;
+  max-width: 45px;
+  max-height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #E35D5B;
+  color: #fff;
+}
+.result-container {
+  width: 100%;
+  height: 385px;
   overflow-y: hidden;
+}
+.result-container:hover {
+  overflow: auto;
+}
+.result-container::-webkit-scrollbar {
+  width: 7px;
+}
+.result-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.result-container::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 10px;
 }
 .item {
   display: flex;
@@ -354,17 +410,32 @@
   text-transform: uppercase;
   max-width: 200px;
 }
-.container:hover {
-  overflow: auto;
+.copied {
+  opacity: 0;
+  transition: all 0.3s ease;
 }
-.container::-webkit-scrollbar {
-  width: 7px;
+.copied.show {
+  opacity: 1;
 }
-.container::-webkit-scrollbar-track {
-  background: transparent;
+.copied.show::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  background: #fff;
+  top: 12px;
+  right: -15px;
+  transform: rotate(45deg);
 }
-.container::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  border-radius: 10px;
+.copied.show::after {
+  content: 'Copied!';
+  position: absolute;
+  padding: 5px;
+  top: 5px;
+  right: -61px;
+  color: #E35D5B;
+  background: #fff;
+  border-radius: 5px;
+  font-size: 0.9em;
 }
 </style>
