@@ -13,10 +13,10 @@
     </div>
     <div class='column-1'>
       <div class="top-section">
-        <input type="text" v-model='query' @keydown.enter='loadVideo()' placeholder="Search for a video or paste a link..." class='search'>
+        <input type="text" v-model='query' @keydown.enter='search()' placeholder="Search for a video or paste a link..." class='search'>
       </div>
       <div class='container' ref='container'>
-        <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index'>
+        <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
           <img :src="item.snippet.thumbnails.medium.url">
           <div style="margin-left:10px">
             <div class='title'>{{ item.snippet.title }}</div>
@@ -180,19 +180,10 @@
           }
         }, 100)
       },
-      loadVideo () {
-        if (this.query.indexOf('youtube') > -1) {
+      search () {
+        if (/^https?/.test(this.query) && this.query.indexOf('youtube') > -1) {
           const id = this.query.split('=')[1]
-          io.emit('resetRoomData')
-          this.player.loadVideoById(id)
-          this.$$rooms.update({
-            id: this.$route.params.roomId,
-            video: {
-              id
-            }
-          })
-          this.query = ''
-          io.emit('updatePlayerState', 'playing')
+          this.loadVideo(id)
         } else {
           const params = {
             part: 'snippet',
@@ -209,6 +200,18 @@
                 })
             })
         }
+      },
+      loadVideo (id) {
+        io.emit('resetRoomData')
+        this.player.loadVideoById(id)
+        this.$$rooms.update({
+          id: this.$route.params.roomId,
+          video: {
+            id
+          }
+        })
+        this.query = ''
+        io.emit('updatePlayerState', 'playing')
       }
     },
     computed: {
@@ -326,6 +329,12 @@
 .item {
   display: flex;
   align-items: center;
+  box-sizing: border-box;
+  padding: 10px;
+}
+.item:hover {
+  background-color: #eee;
+  cursor: pointer;
 }
 .item img {
   width: 168px;
@@ -338,11 +347,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #333;
 }
 .item .channel {
-  font-size: 0.8em;
+  font-size: 0.7em;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  max-width: 200px;
 }
 .container:hover {
   overflow: auto;
