@@ -5,7 +5,7 @@
 # 'bind' controls which local interfaces will be listened on
 # 'port' controls which port will be listened on
 #------------------------------------------------------------------------------
-# bind = [ "localhost" ]
+bind = [ "localhost" ]
 # port = 8181
 
 
@@ -14,7 +14,7 @@
 # 'secure' will disable HTTPS and use HTTP instead when set to 'false'
 # 'key_file' and 'cert_file' are required for serving HTTPS
 #------------------------------------------------------------------------------
-# secure = true
+secure = false
 # key_file = "horizon-key.pem"
 # cert_file = "horizon-cert.pem"
 
@@ -50,7 +50,7 @@ project_name = "view"
 # 'rdb_timeout' is the number of seconds to wait when connecting to RethinkDB
 #------------------------------------------------------------------------------
 # connect = "localhost:28015"
-# start_rethinkdb = false
+start_rethinkdb = true
 # rdb_timeout = 30
 
 

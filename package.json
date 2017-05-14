@@ -10,7 +10,8 @@
     "horizon": "hz serve --dev",
     "build": "node build/build.js",
     "server": "nodemon server.js",
-    "lint": "eslint --ext .js,.vue src"
+    "lint": "eslint --ext .js,.vue src",
+    "hz": "hz serve"
   },
   "dependencies": {
     "@horizon/client": "^2.0.0",
