@@ -12,19 +12,19 @@
     <div class="container">
       <div class='player' id="player"></div>
       <div class='sidecard'>
-        <div class='no-queue' v-if='Object.keys(room).length > 0 && !room.playlist.length && !searchIsActive'>
+        <div class='no-queue' v-if='Object.keys(room).length > 0 && !room.playlist.length'>
           <div class='info'>There are currently no queued videos</div>
           <button class='button accent' @click='searchIsActive = true'>Search for videos</button>
         </div>
-        <div v-else-if='searchIsActive'>
-          <div class='search-container'>
+        <div class='search-container' :class='{"slide": searchIsActive}'>
+          <div class='input-container'>
             <input type="text" class='search' v-model='query' @keydown.enter='search()' placeholder="Search for a video or paste a URL...">
-            <div class='close'>&#x2715;</div>
+            <div class='close' @click='searchIsActive = false'>&#x2715;</div>
           </div>
           <div class='result-container'>
             <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
               <img :src="item.snippet.thumbnails.medium.url">
-              <div style="margin-left:10px">
+              <div style="display:flex;flex-direction:column;margin-left:10px">
                 <div class='title'>{{ item.snippet.title }}</div>
                 <div class='channel'>{{ item.snippet.channelTitle }}</div>
               </div>
@@ -33,31 +33,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class='column-2'>
-      <div class='top-section'>
-        <h4 class='logo'>View</h4>
-        <span class='link' :data-clipboard-text='url'>
-          {{ url }}
-          <div class='copied' ref='copied'></div>
-        </span>
-        <span class='views' v-if='Object.keys(room).length > 0'>{{ room.viewers.length }} Watching</span>
-      </div>
-      <div class='player' id="player"></div>
-    </div>
-    <div class='column-1'>
-      <div class="top-section">
-        <input type="text" v-model='query' @keydown.enter='search()' placeholder="Search for a video or paste a link..." class='search'>
-      </div>
-      <div class='container' ref='container'>
-        <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
-          <img :src="item.snippet.thumbnails.medium.url">
-          <div style="margin-left:10px">
-            <div class='title'>{{ item.snippet.title }}</div>
-            <div class='channel'>{{ item.snippet.channelTitle }}</div>
-          </div>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -317,6 +292,7 @@
   height: 430px;
   background-color: #fff;
   box-shadow: 7px 7px 18px rgba(0,0,0,0.3);
+  overflow-y: hidden;
 }
 .no-queue {
   width: 100%;
@@ -336,6 +312,14 @@
   margin-bottom: 20px;
 }
 .search-container {
+  background-color: #fff;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
+}
+.search-container.slide {
+  transform: translateY(-100%);
+}
+.input-container {
   display: flex;
 }
 .search {
@@ -363,6 +347,7 @@
   align-items: center;
   background-color: #E35D5B;
   color: #fff;
+  cursor: pointer;
 }
 .result-container {
   width: 100%;
