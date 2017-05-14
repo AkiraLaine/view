@@ -46,4 +46,20 @@ html, body {
   transform: translateX(-100%);
   opacity: 0
 }
+.footer {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: 0.8em;
+  color: #eee;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.footer a {
+  color: #fff;
+  text-decoration: none;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
 </style>

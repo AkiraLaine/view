@@ -47,6 +47,10 @@
         </div>
       </div>
     </div>
+    <div class='footer'>
+      <span>Made by <a href="https://akiralaine.github.io" target="_blank">Akira</a> and <a href="https://simulatedgreg.github.io" target="_blank">Greg</a></span>
+      <span>Check out the code on <a href="https://github.com/AkiraLaine/view" target="_blank">GitHub</a></span>
+    </div>
   </div>
 </template>
 
@@ -274,6 +278,8 @@
   background-color: #f6f6f6;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .navbar {
   width: 100%;
@@ -465,5 +471,14 @@
   background: #fff;
   border-radius: 5px;
   font-size: 0.9em;
+}
+.footer {
+  color: #333;
+}
+.footer a {
+  color: #555;
+}
+.footer a:hover {
+  text-decoration: underline;
 }
 </style>
