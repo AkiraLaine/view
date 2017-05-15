@@ -58,8 +58,7 @@
   import Clipboard from 'clipboard'
   import queryString from 'query-string'
   import socket from 'socket.io-client'
-  const URL = process.env.NODE_ENV === 'production' ? 'http://104.131.108.12' : 'http://localhost:3000'
-  const io = socket.connect(URL)
+  const io = socket.connect('http://localhost:3000')
 
   export default {
     name: 'room',
@@ -67,7 +66,8 @@
       userId: String
     },
     created () {
-      this.subscribeToRoom()
+      this.initSocketListeners()
+      this.getRoomData()
     },
     mounted () {
       var tag = document.createElement('script')
@@ -135,7 +135,13 @@
       }
     },
     methods: {
-      subscribeToRoom () {
+      initSocketListeners () {
+        io.on('updatedData', room => {
+          console.log(room)
+          if (room.id === this.$route.params.roomId) this.room = room
+        })
+      },
+      getRoomData () {
         if (!this.$route.params.roomId) {
           // create room
           const room = {
@@ -148,22 +154,12 @@
               currentTime: 0
             }
           }
-          this.$$rooms.insert(room)
-            .subscribe(() => {
-              this.$router.push({ path: `/room/${room.id}` })
-              this.room = room
-              this.watchRoom()
-            })
-        } else this.watchRoom()
-      },
-      watchRoom () {
-        io.emit('join-room', { roomId: this.$route.params.roomId, userId: this.userId })
-        this.$$rooms.find({ id: this.$route.params.roomId })
-          .watch()
-          .subscribe(room => {
-            this.room = room
-          })
-        this.getInitialVideoState()
+          io.emit('createRoom', room)
+          this.$router.push({ path: `/room/${room.id}` })
+        } else {
+          io.emit('joinRoom', { roomId: this.$route.params.roomId, userId: this.userId })
+          this.getInitialVideoState()
+        }
       },
       getInitialVideoState () {
         let checkIfEverythingReady = setInterval(() => {
@@ -185,17 +181,16 @@
       },
       handleStateChange (event) {
         if (event.data === YT.PlayerState.PLAYING) { // eslint-disable-line
-          io.emit('updatePlayerState', 'playing')
+          if (Object.keys(this.room).length > 0 && this.room.video.status !== 'playing') {
+            io.emit('updatePlayerState', 'playing')
+          }
         } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
           io.emit('updatePlayerState', 'paused')
         } else if (event.data === YT.PlayerState.ENDED) { // eslint-disable-line
           if (Object.keys(this.room).length > 0 && this.room.queue.length > 0) {
-            const nextVideo = this.room.queue.splice(0, 1)[0]
+            const nextVideo = this.room.queue[0]
+            io.emit('removeVideoFromQueue')
             this.loadVideo(nextVideo.id.videoId)
-            this.$$rooms.update({
-              id: this.$route.params.roomId,
-              queue: this.room.queue
-            })
           }
         }
       },
@@ -239,24 +234,13 @@
         }
       },
       loadVideo (id) {
-        io.emit('resetRoomData')
+        io.emit('trackNewVideo', id)
         this.player.loadVideoById(id)
-        this.$$rooms.update({
-          id: this.$route.params.roomId,
-          video: {
-            id
-          }
-        })
         this.query = ''
         io.emit('updatePlayerState', 'playing')
       },
       addVideoToQueue (item) {
-        let queue = this.room.queue
-        queue.push(item)
-        this.$$rooms.update({
-          id: this.$route.params.roomId,
-          queue
-        })
+        io.emit('addVideoToQueue', item)
       }
     },
     computed: {

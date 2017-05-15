@@ -1,96 +1,85 @@
 global.WebSocket = require('ws')
 
-const hz = new require('@horizon/client')()
 const io = require('socket.io')(3000)
-
-const rooms = hz('rooms')
-
 const roomData = {}
+const roomInterval = {}
 
 io.on('connection', socket => {
   let userData = {}
-  socket.on('join-room', ({ roomId, userId }) => {
-    userData = { roomId, userId }
-    rooms.find(roomId).fetch().subscribe(room => {
-      if (room.viewers.indexOf(userId) === -1) {
-        room.viewers.push(userId)
 
-        rooms.update({
-          id: userData.roomId,
-          viewers: room.viewers
-        })
-      }
-    })
+  socket.on('createRoom', room => {
+    userData = {
+      roomId: room.id,
+      userId: room.viewers[0]
+    }
+    roomData[room.id] = room
+    roomInterval[room.id] = {
+      interval: null,
+      time: 0
+    }
+    io.emit('updatedData', room)
+  })
+
+  socket.on('joinRoom', ({ roomId, userId }) => {
+    userData = { roomId, userId }
+    let room = roomData[roomId]
+    if (room && room.viewers.indexOf(userId) === -1) {
+      room.viewers.push(userId)
+    }
+    room.video.currentTime = roomInterval[roomId].time
+    io.emit('updatedData', room)
   })
 
   socket.on('updatePlayerState', state => {
-    rooms.update({
-      id: userData.roomId,
-      video: {
-        status: state, 
-      }
-    })
+    let room = roomData[userData.roomId]
     if (state === 'playing') {
-      roomData[userData.roomId] = roomData[userData.roomId] || {}
-      if (Object.keys(roomData[userData.roomId]).length === 0) {
-        roomData[userData.roomId] = {
-          time: 0,
-          interval: null,
-          playing: false
-        }
-      }
-
-      if (!roomData[userData.roomId].playing) {
-        roomData[userData.roomId].playing = true
-        roomData[userData.roomId].interval = setInterval(() => {
-          rooms.update({
-            id: userData.roomId,
-            video: {
-              currentTime: roomData[userData.roomId].time++
-            }
-          })
-        }, 1000)
-      }
-
+      room.video.status = 'playing'
+      io.emit('updatedData', room)
+      roomInterval[userData.roomId].interval = setInterval(() => {
+        roomInterval[userData.roomId].time++
+      }, 1000)
     } else if (state === 'paused') {
-      clearInterval(roomData[userData.roomId].interval)
-      roomData[userData.roomId].playing = false
-      rooms.update({
-        id: userData.roomId,
-        video: {
-          currentTime: roomData[userData.roomId].time
-        }
-      })
+      if (roomInterval[userData.roomId] && roomInterval[userData.roomId].interval) {
+        clearInterval(roomInterval[userData.roomId].interval)
+      }
+      room.video.status = 'paused'
+      io.emit('updatedData', room)
     }
   })
 
   socket.on('updateCurrentTime', time => {
-    roomData[userData.roomId].time = time
+    roomInterval[userData.roomId].time = time
+    roomData[userData.roomId].video.currentTime = time
+    io.emit('updatedData', roomData[userData.roomId])
   })
 
-  socket.on('resetRoomData', () => {
-    clearInterval(roomData[userData.roomId].interval)
-    roomData[userData.roomId] = {
-      time: 0,
-      interval: null,
-      playing: false
-    }
+  socket.on('trackNewVideo', id => {
+    clearInterval(roomInterval[userData.roomId].interval)
+    roomInterval[userData.roomId].time = 0
+    roomData[userData.roomId].video.id = id
+    roomData[userData.roomId].video.currentTime = 0
+    io.emit('updatedData', roomData[userData.roomId])
+  })
+
+  socket.on('addVideoToQueue', item => {
+    roomData[userData.roomId].queue.push(item)
+    io.emit('updatedData', roomData[userData.roomId])
+  })
+
+  socket.on('removeVideoFromQueue', () => {
+    roomData[userData.roomId].queue.splice(0, 1)
+    io.emit('updatedData', roomData[userData.roomId])
   })
 
   socket.on('disconnect', () => {
-    rooms.find(userData.roomId).fetch().subscribe(room => {
-      let viewerIndex = room.viewers.indexOf(userData.userId)
-      room.viewers.splice(viewerIndex, 1)
-
-      if (room.viewers.length === 0) {
-        rooms.remove(userData.roomId)
-        delete roomData[userData.roomId]
-      } else {
-        rooms.update({
-          id: userData.roomId,
-          viewers: room.viewers
-        })
-      }
-    })
+    let room = roomData[userData.roomId]
+    let index = room.viewers.indexOf(userData.userId)
+    room.viewers.splice(index, 1)
+    io.emit('updatedData', room)
+    if (room.viewers.length === 0) {
+      delete roomData[userData.roomId]
+      clearInterval(roomInterval[userData.roomId].interval)
+      delete roomInterval[userData.roomId]
+    }
   })
 })

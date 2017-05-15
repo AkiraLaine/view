@@ -1,20 +1,17 @@
 {
   "name": "view",
   "version": "1.0.0",
-  "description": "A Vue.js project",
-  "author": "Greg Holguin <simulatedgreg@gmail.com>",
+  "description": "watch youtube videos together with your friends",
+  "author": "Akira Laine <akira_laine@outlook.com>",
   "private": true,
   "scripts": {
-    "dev": "npm-run-all --parallel webpack horizon server",
+    "dev": "npm-run-all --parallel webpack server",
     "webpack": "node build/dev-server.js",
-    "horizon": "hz serve --dev",
     "build": "node build/build.js",
     "server": "nodemon server.js",
-    "lint": "eslint --ext .js,.vue src",
-    "hz": "hz serve"
+    "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
-    "@horizon/client": "^2.0.0",
     "clipboard": "^1.6.1",
     "query-string": "^4.3.4",
     "socket.io": "^1.7.4",
