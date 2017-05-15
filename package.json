@@ -9,6 +9,7 @@
     "webpack": "node build/dev-server.js",
     "build": "node build/build.js",
     "server": "nodemon server.js",
+    "start": "node server.js",
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
@@ -69,12 +70,14 @@
     "webpack-merge": "^4.1.0"
   },
   "engines": {
-    "node": ">= 4.0.0",
-    "npm": ">= 3.0.0"
+    "node": "^7.0.0"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "now": {
+    "files": ["keys.json"]
+  }
 }
