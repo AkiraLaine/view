@@ -80,7 +80,7 @@
           this.player = new YT.Player('player', { // eslint-disable-line
             height: '430',
             width: '710',
-            videoId: this.room.video.id,
+            videoId: 'CZlfbep2LdU',
             playerVars: {
               rel: 0
             },
