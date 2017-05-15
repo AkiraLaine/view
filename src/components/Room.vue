@@ -58,7 +58,7 @@
   import Clipboard from 'clipboard'
   import queryString from 'query-string'
   import io from 'socket.io-client'
-  const socket = io(`${window.location.protocol + '//' + window.location.hostname}:3000`)
+  const socket = process.env.NODE_ENV === 'production' ? io() : io(`http://localhost:3000`)
 
   export default {
     name: 'room',
@@ -255,9 +255,6 @@
         if (Object.keys(this.room).length > 0) {
           return this.room.queue
         }
-      },
-      connectURL () {
-        return window.location.protocol + '//' + window.location.hostname
       }
     }
   }

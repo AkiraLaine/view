@@ -85,14 +85,17 @@ io.on('connection', socket => {
       let index = room.viewers.indexOf(userData.userId)
       room.viewers.splice(index, 1)
       io.emit('updatedData', room)
-      if (room.viewers.length === 0) {
-        delete roomData[userData.roomId]
-        clearInterval(roomInterval[userData.roomId].interval)
-        delete roomInterval[userData.roomId]
-      }
     }
   })
 })
+
+setInterval(() => {
+  Object.keys(roomData).forEach(id => {
+    if (roomData[id].viewers.length === 0) {
+      delete roomData[id]
+    }
+  })
+}, 60000)
 
 
 server.listen(3000)
