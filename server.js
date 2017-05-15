@@ -29,11 +29,13 @@ io.on('connection', socket => {
   socket.on('joinRoom', ({ roomId, userId }) => {
     userData = { roomId, userId }
     let room = roomData[roomId]
-    if (room && room.viewers.indexOf(userId) === -1) {
-      room.viewers.push(userId)
+    if (room && Object.keys(room).length > 0) {
+      if (room.viewers.indexOf(userId) === -1) {
+        room.viewers.push(userId)
+      }
+      room.video.currentTime = roomInterval[roomId].time
+      io.emit('updatedData', room)
     }
-    room.video.currentTime = roomInterval[roomId].time
-    io.emit('updatedData', room)
   })
 
   socket.on('updatePlayerState', state => {
@@ -79,16 +81,18 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     let room = roomData[userData.roomId]
-    let index = room.viewers.indexOf(userData.userId)
-    room.viewers.splice(index, 1)
-    io.emit('updatedData', room)
-    if (room.viewers.length === 0) {
-      delete roomData[userData.roomId]
-      clearInterval(roomInterval[userData.roomId].interval)
-      delete roomInterval[userData.roomId]
+    if (room && Object.keys(room).length > 0) {
+      let index = room.viewers.indexOf(userData.userId)
+      room.viewers.splice(index, 1)
+      io.emit('updatedData', room)
+      if (room.viewers.length === 0) {
+        delete roomData[userData.roomId]
+        clearInterval(roomInterval[userData.roomId].interval)
+        delete roomInterval[userData.roomId]
+      }
     }
   })
 })
 
 
-server.listen(process.env.PORT || 3000)
+server.listen(3000)

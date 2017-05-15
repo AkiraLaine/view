@@ -57,8 +57,8 @@
 <script>
   import Clipboard from 'clipboard'
   import queryString from 'query-string'
-  import socket from 'socket.io-client'
-  const io = socket.connect()
+  import io from 'socket.io-client'
+  const socket = io(`${window.location.protocol + '//' + window.location.hostname}:3000`)
 
   export default {
     name: 'room',
@@ -80,7 +80,7 @@
           this.player = new YT.Player('player', { // eslint-disable-line
             height: '430',
             width: '710',
-            videoId: this.room.video.id || 'CZlfbep2LdU',
+            videoId: Object.keys(this.room).length > 0 ? this.room.video.id : 'CZlfbep2LdU',
             playerVars: {
               rel: 0
             },
@@ -138,7 +138,7 @@
     },
     methods: {
       initSocketListeners () {
-        io.on('updatedData', room => {
+        socket.on('updatedData', room => {
           console.log(room)
           if (room.id === this.$route.params.roomId) this.room = room
         })
@@ -156,10 +156,10 @@
               currentTime: 0
             }
           }
-          io.emit('createRoom', room)
+          socket.emit('createRoom', room)
           this.$router.push({ path: `/room/${room.id}` })
         } else {
-          io.emit('joinRoom', { roomId: this.$route.params.roomId, userId: this.userId })
+          socket.emit('joinRoom', { roomId: this.$route.params.roomId, userId: this.userId })
           this.getInitialVideoState()
         }
       },
@@ -184,14 +184,14 @@
       handleStateChange (event) {
         if (event.data === YT.PlayerState.PLAYING) { // eslint-disable-line
           if (Object.keys(this.room).length > 0 && this.room.video.status !== 'playing') {
-            io.emit('updatePlayerState', 'playing')
+            socket.emit('updatePlayerState', 'playing')
           }
         } else if (event.data === YT.PlayerState.PAUSED)  { // eslint-disable-line
-          io.emit('updatePlayerState', 'paused')
+          socket.emit('updatePlayerState', 'paused')
         } else if (event.data === YT.PlayerState.ENDED) { // eslint-disable-line
           if (Object.keys(this.room).length > 0 && this.room.queue.length > 0) {
             const nextVideo = this.room.queue[0]
-            io.emit('removeVideoFromQueue')
+            socket.emit('removeVideoFromQueue')
             this.loadVideo(nextVideo.id.videoId)
           }
         }
@@ -206,7 +206,7 @@
               if (lastCurrentTime !== -1) {
                 const currentTime = this.player.getCurrentTime()
                 if (Math.abs(currentTime - lastCurrentTime) > 3) {
-                  io.emit('updateCurrentTime', currentTime)
+                  socket.emit('updateCurrentTime', currentTime)
                 }
                 lastCurrentTime = currentTime
               } else lastCurrentTime = this.player.getCurrentTime()
@@ -236,13 +236,13 @@
         }
       },
       loadVideo (id) {
-        io.emit('trackNewVideo', id)
+        socket.emit('trackNewVideo', id)
         this.player.loadVideoById(id)
         this.query = ''
-        io.emit('updatePlayerState', 'playing')
+        socket.emit('updatePlayerState', 'playing')
       },
       addVideoToQueue (item) {
-        io.emit('addVideoToQueue', item)
+        socket.emit('addVideoToQueue', item)
       }
     },
     computed: {
@@ -255,6 +255,9 @@
         if (Object.keys(this.room).length > 0) {
           return this.room.queue
         }
+      },
+      connectURL () {
+        return window.location.protocol + '//' + window.location.hostname
       }
     }
   }
