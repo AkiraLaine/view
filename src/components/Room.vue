@@ -76,16 +76,18 @@
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
 
       window.onYouTubeIframeAPIReady = () => {
-        this.player = new YT.Player('player', { // eslint-disable-line
-          height: '430',
-          width: '710',
-          videoId: this.room.video.id,
-          playerVars: {
-            rel: 0
-          },
-          events: {
-            onStateChange: this.handleStateChange
-          }
+        this.$nextTick(() => {
+          this.player = new YT.Player('player', { // eslint-disable-line
+            height: '430',
+            width: '710',
+            videoId: this.room.video.id,
+            playerVars: {
+              rel: 0
+            },
+            events: {
+              onStateChange: this.handleStateChange
+            }
+          })
         })
       }
 
