@@ -58,7 +58,7 @@
   import Clipboard from 'clipboard'
   import queryString from 'query-string'
   import socket from 'socket.io-client'
-  const io = socket.connect('http://localhost:3000')
+  const io = socket.connect()
 
   export default {
     name: 'room',
@@ -268,7 +268,7 @@
 }
 .navbar {
   width: 100%;
-  height: 80px;  
+  height: 80px;
   background-color: #E35D5B;
 }
 .navbar-container {
@@ -312,7 +312,7 @@
   height: 100%;
   display: flex;
   justify-content: space-between;
-  padding-top: 40px; 
+  padding-top: 40px;
 }
 .sidecard {
   width: 400px;

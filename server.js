@@ -1,6 +1,12 @@
-global.WebSocket = require('ws')
+const app = require('express')()
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
+const path = require('path')
+const history = require('connect-history-api-fallback')
 
-const io = require('socket.io')(3000)
+app.use(history())
+app.use(require('express').static(path.join(__dirname, '/dist')))
+
 const roomData = {}
 const roomInterval = {}
 
@@ -83,3 +89,6 @@ io.on('connection', socket => {
     }
   })
 })
+
+
+server.listen(3000)
