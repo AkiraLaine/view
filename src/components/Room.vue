@@ -76,19 +76,22 @@
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
 
       window.onYouTubeIframeAPIReady = () => {
-        this.$nextTick(() => {
-          this.player = new YT.Player('player', { // eslint-disable-line
-            height: '430',
-            width: '710',
-            videoId: Object.keys(this.room).length > 0 ? this.room.video.id : 'CZlfbep2LdU',
-            playerVars: {
-              rel: 0
-            },
-            events: {
-              onStateChange: this.handleStateChange
-            }
-          })
-        })
+        let interval = setInterval(() => {
+          if (Object.keys(this.room).length > 0) {
+            clearInterval(interval)
+            this.player = new YT.Player('player', { // eslint-disable-line
+              height: '430',
+              width: '710',
+              videoId: this.room.video.id,
+              playerVars: {
+                rel: 0
+              },
+              events: {
+                onStateChange: this.handleStateChange
+              }
+            })
+          }
+        }, 100)
       }
 
       const clipboard = new Clipboard('.link') // eslint-disable-line
