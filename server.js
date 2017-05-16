@@ -40,18 +40,20 @@ io.on('connection', socket => {
 
   socket.on('updatePlayerState', state => {
     let room = roomData[userData.roomId]
-    if (state === 'playing') {
-      room.video.status = 'playing'
-      io.emit('updatedData', room)
-      roomInterval[userData.roomId].interval = setInterval(() => {
-        roomInterval[userData.roomId].time++
-      }, 1000)
-    } else if (state === 'paused') {
-      if (roomInterval[userData.roomId] && roomInterval[userData.roomId].interval) {
-        clearInterval(roomInterval[userData.roomId].interval)
+    if (room && Object.keys(room).length > 0) {
+      if (state === 'playing') {
+        room.video.status = 'playing'
+        io.emit('updatedData', room)
+        roomInterval[userData.roomId].interval = setInterval(() => {
+          roomInterval[userData.roomId].time++
+        }, 1000)
+      } else if (state === 'paused') {
+        if (roomInterval[userData.roomId] && roomInterval[userData.roomId].interval) {
+          clearInterval(roomInterval[userData.roomId].interval)
+        }
+        room.video.status = 'paused'
+        io.emit('updatedData', room)
       }
-      room.video.status = 'paused'
-      io.emit('updatedData', room)
     }
   })
 

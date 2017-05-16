@@ -10,7 +10,10 @@
       </div>
     </div>
     <div class="container">
-      <div class='player' id="player"></div>
+      <div style="position:relative">
+        <span class='usercount' v-if='userCount'>Users in room: <span style='color:#E35D5B;font-weight:600'>{{ userCount }}</span></span>
+        <div class='player' id="player"></div>
+      </div>
       <div class='sidecard'>
         <div class='no-queue' v-if='Object.keys(room).length > 0 && !room.queue.length'>
           <div class='info'>There are currently no queued videos</div>
@@ -258,6 +261,11 @@
         if (Object.keys(this.room).length > 0) {
           return this.room.queue
         }
+      },
+      userCount () {
+        if (Object.keys(this.player).length > 0 && Object.keys(this.room).length > 0) {
+          return this.room.viewers.length
+        }
       }
     }
   }
@@ -318,6 +326,13 @@
   display: flex;
   justify-content: space-between;
   padding-top: 40px;
+}
+.usercount {
+  position: absolute;
+  top: -25px;
+  right: 0;
+  font-size: 0.9em;
+  font-weight: 300;
 }
 .sidecard {
   width: 400px;
