@@ -36,7 +36,7 @@
 
 html, body { 
   font-family: 'Open Sans', sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .slide-enter-active, .slide-leave-active {

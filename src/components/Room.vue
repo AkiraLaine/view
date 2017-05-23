@@ -11,7 +11,7 @@
     </div>
     <div class="container">
       <div class='notification-chip' v-show='showNotification'>{{ notificationText }}</div>
-      <div style="position:relative">
+      <div class="video-container">
         <span class='usercount' v-if='userCount'>Users in room: <span style='color:#E35D5B;font-weight:600'>{{ userCount }}</span></span>
         <div class='player' id="player"></div>
       </div>
@@ -27,7 +27,7 @@
             <div class="item" v-for='(item, index) in queue' v-if='queue.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
               <div class='remove' @click.stop='removeVideoFromQueue(item)'>x</div>
               <img :src="item.snippet.thumbnails.medium.url">
-              <div style="display:flex;flex-direction:column;margin-left:10px">
+              <div class='item-details'>
                 <div class='title'>{{ item.snippet.title }}</div>
                 <div class='channel'>{{ item.snippet.channelTitle }}</div>
               </div>
@@ -42,7 +42,7 @@
           <div class='result-container'>
             <div class="item" v-for='(item, index) in results' v-if='results.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
               <img :src="item.snippet.thumbnails.medium.url">
-              <div style="display:flex;flex-direction:column;margin-left:10px">
+              <div class='item-details'>
                 <div class='title'>{{ item.snippet.title }}</div>
                 <div class='channel'>{{ item.snippet.channelTitle }}</div>
                 <span class="add-to-queue" @click.stop='addVideoToQueue(item)'>+ Add to queue</span>
@@ -51,10 +51,10 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class='footer'>
-      <span>Made by <a href="https://akiralaine.github.io" target="_blank">Akira</a> and <a href="https://simulatedgreg.github.io" target="_blank">Greg</a></span>
-      <span>Check out the code on <a href="https://github.com/AkiraLaine/view" target="_blank">GitHub</a></span>
+      <div class='footer'>
+        <span>Made by <a href="https://akiralaine.github.io" target="_blank">Akira</a> and <a href="https://simulatedgreg.github.io" target="_blank">Greg</a></span>
+        <span>Check out the code on <a href="https://github.com/AkiraLaine/view" target="_blank">GitHub</a></span>
+      </div>
     </div>
   </div>
 </template>
@@ -85,8 +85,8 @@
           if (Object.keys(this.room).length > 0) {
             clearInterval(interval)
             this.player = new YT.Player('player', { // eslint-disable-line
-              height: '430',
-              width: '710',
+              height: '100%',
+              width: '100%',
               videoId: this.room.video.id,
               playerVars: {
                 rel: 0
@@ -343,12 +343,18 @@
   color: #fff;
 }
 .container {
+  display: flex;
+  flex-wrap: wrap;
   margin: 0 auto;
   width: 80%;
   height: 100%;
-  display: flex;
-  justify-content: space-between;
   padding-top: 40px;
+}
+.video-container {
+  position: relative;
+  margin-right: 20px;
+  width: 710px;
+  height: 430px;
 }
 .usercount {
   position: absolute;
@@ -358,6 +364,7 @@
   font-weight: 300;
 }
 .sidecard {
+  min-width: 400px;
   width: 400px;
   height: 430px;
   background-color: #fff;
@@ -422,10 +429,11 @@
 .result-container {
   width: 100%;
   height: 385px;
+  overflow-x: hidden;
   overflow-y: hidden;
 }
 .result-container:hover {
-  overflow: auto;
+  overflow-y: auto;
 }
 .result-container::-webkit-scrollbar {
   width: 7px;
@@ -450,6 +458,11 @@
 }
 .item:hover .remove {
   visibility: visible;
+}
+.item .item-details {
+  display:flex;
+  flex-direction:column;
+  margin-left:10px
 }
 .item img {
   width: 168px;
@@ -524,6 +537,7 @@
 }
 .footer {
   color: #333;
+  margin-top: auto;
 }
 .footer a {
   color: #555;
@@ -539,5 +553,30 @@
   background-color: rgba(0,0,0,0.9);
   color: #eee;
   z-index: 10;
+}
+@media (max-width: 1412px) {
+  .wrapper {
+    padding-bottom: 20px;
+  }
+  .video-container {
+    width: 100%;
+    height: 400px;
+    margin-right: 0;
+  }
+  .sidecard {
+    margin: 20px 0;
+    min-width: 0;
+    width: 100%;
+  }
+  .item {
+    flex-direction: column;
+  }
+  .item-details {
+    align-items: center;
+    margin-left: 0 !important;
+  }
+  .item .title, .item .channel {
+    max-width: 280px;
+  }
 }
 </style>
