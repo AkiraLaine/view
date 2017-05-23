@@ -197,8 +197,8 @@
         } else if (event.data === YT.PlayerState.ENDED) { // eslint-disable-line
           if (Object.keys(this.room).length > 0 && this.room.queue.length > 0) {
             const nextVideo = this.room.queue[0]
-            socket.emit('removeVideoFromQueue')
             this.loadVideo(nextVideo.id.videoId)
+            socket.emit('removeVideoFromQueue', nextVideo.id.videoId, true)
           }
         }
       },

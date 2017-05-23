@@ -72,12 +72,21 @@ io.on('connection', socket => {
   })
 
   socket.on('addVideoToQueue', item => {
-    roomData[userData.roomId].queue.push(item)
-    io.emit('updatedData', roomData[userData.roomId])
+    if (roomData[userData.roomId]) {
+      roomData[userData.roomId].queue.push(item)
+      io.emit('updatedData', roomData[userData.roomId])
+    }
   })
 
-  socket.on('removeVideoFromQueue', () => {
-    roomData[userData.roomId].queue.splice(0, 1)
+  socket.on('removeVideoFromQueue', (videoId, currentVideoEnded) => {
+    if (currentVideoEnded) {
+      if (roomData[userData.roomId].queue[0].id.videoId === videoId) {
+        roomData[userData.roomId].queue.splice(0, 1)
+      }
+    } else {
+      let index = roomData[userData.roomId].queue.findIndex(video => video.videoId.id === videoId)
+      roomData[userData.roomId].queue.splice(index, 1)
+    }
     io.emit('updatedData', roomData[userData.roomId])
   })
 
