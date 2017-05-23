@@ -84,7 +84,7 @@ io.on('connection', socket => {
         roomData[userData.roomId].queue.splice(0, 1)
       }
     } else {
-      let index = roomData[userData.roomId].queue.findIndex(video => video.videoId.id === videoId)
+      let index = roomData[userData.roomId].queue.findIndex(video => video.id.videoId === videoId)
       roomData[userData.roomId].queue.splice(index, 1)
     }
     io.emit('updatedData', roomData[userData.roomId])

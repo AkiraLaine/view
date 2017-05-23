@@ -10,6 +10,7 @@
       </div>
     </div>
     <div class="container">
+      <div class='notification-chip' v-show='showNotification'>{{ notificationText }}</div>
       <div style="position:relative">
         <span class='usercount' v-if='userCount'>Users in room: <span style='color:#E35D5B;font-weight:600'>{{ userCount }}</span></span>
         <div class='player' id="player"></div>
@@ -24,6 +25,7 @@
           <img @click='searchIsActive = true' style="cursor:pointer;width:20px;position:absolute;top:3px;right:10px;" src="../assets/search.png">
           <div class='result-container' style="height:100%;padding-bottom:25px">
             <div class="item" v-for='(item, index) in queue' v-if='queue.length > 0' :key='index' @click='loadVideo(item.id.videoId)'>
+              <div class='remove' @click.stop='removeVideoFromQueue(item)'>x</div>
               <img :src="item.snippet.thumbnails.medium.url">
               <div style="display:flex;flex-direction:column;margin-left:10px">
                 <div class='title'>{{ item.snippet.title }}</div>
@@ -43,7 +45,7 @@
               <div style="display:flex;flex-direction:column;margin-left:10px">
                 <div class='title'>{{ item.snippet.title }}</div>
                 <div class='channel'>{{ item.snippet.channelTitle }}</div>
-                <span class="queue" @click.stop='addVideoToQueue(item)'>+ Add to queue</span>
+                <span class="add-to-queue" @click.stop='addVideoToQueue(item)'>+ Add to queue</span>
               </div>
             </div>
           </div>
@@ -116,7 +118,9 @@
         seekInterval: null,
         query: '',
         results: [],
-        searchIsActive: false
+        searchIsActive: false,
+        showNotification: false,
+        notificationText: ''
       }
     },
     watch: {
@@ -248,7 +252,26 @@
         socket.emit('updatePlayerState', 'playing')
       },
       addVideoToQueue (item) {
-        socket.emit('addVideoToQueue', item)
+        const video = this.room.queue.find(video => video.id.videoId === item.id.videoId) || {}
+        if (Object.keys(video).length === 0) {
+          socket.emit('addVideoToQueue', item)
+          this.showNotification = true
+          this.notificationText = 'Video added to queue'
+          setTimeout(() => {
+            this.showNotification = false
+            this.notificationText = ''
+          }, 1000)
+        } else {
+          this.showNotification = true
+          this.notificationText = 'Video already in queue'
+          setTimeout(() => {
+            this.showNotification = false
+            this.notificationText = ''
+          }, 1000)
+        }
+      },
+      removeVideoFromQueue (video) {
+        socket.emit('removeVideoFromQueue', video.id.videoId, false)
       }
     },
     computed: {
@@ -419,10 +442,14 @@
   align-items: center;
   box-sizing: border-box;
   padding: 10px;
+  position: relative;
 }
 .item:hover {
   background-color: #eee;
   cursor: pointer;
+}
+.item:hover .remove {
+  visibility: visible;
 }
 .item img {
   width: 168px;
@@ -442,12 +469,30 @@
   text-transform: uppercase;
   max-width: 200px;
 }
-.item .queue {
+.item .add-to-queue {
   font-size: 0.7em;
   color: #E35D5B;
+  border: 1px solid #E35D5B;
+  padding: 3px 6px;
+  margin-top: 10px;
+  width: 95px;
+  transition: all 0.3s ease;
 }
-.item .queue:hover {
-  text-decoration: underline;
+.item .add-to-queue:hover {
+  background-color: #E35D5B;
+  color: #fff;
+}
+.item .remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #999;
+  cursor: pointer;
+  font-weight: 600;
+  visibility: hidden;
+}
+.item .remove:hover {
+  color: #666;
 }
 .copied {
   opacity: 0;
@@ -485,5 +530,14 @@
 }
 .footer a:hover {
   text-decoration: underline;
+}
+.notification-chip {
+  padding: 8px 13px;
+  position: absolute;
+  top: 6em;
+  right: 3em;
+  background-color: rgba(0,0,0,0.9);
+  color: #eee;
+  z-index: 10;
 }
 </style>
