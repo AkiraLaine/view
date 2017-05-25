@@ -225,25 +225,20 @@
         }, 100)
       },
       search () {
-        if (/^https?/.test(this.query) && this.query.indexOf('youtube') > -1) {
-          const id = this.query.split('=')[1]
-          this.loadVideo(id)
-        } else {
-          const params = {
-            part: 'snippet',
-            q: this.query,
-            key: require('@/keys').YOUTUBE_API_KEY,
-            type: 'video',
-            maxResults: 10
-          }
-          fetch(`https://www.googleapis.com/youtube/v3/search?${queryString.stringify(params)}`)
-            .then(response => {
-              response.json()
-                .then(data => {
-                  this.results = data.items
-                })
-            })
+        const params = {
+          part: 'snippet',
+          q: this.query,
+          key: require('@/keys').YOUTUBE_API_KEY,
+          type: 'video',
+          maxResults: 10
         }
+        fetch(`https://www.googleapis.com/youtube/v3/search?${queryString.stringify(params)}`)
+          .then(response => {
+            response.json()
+              .then(data => {
+                this.results = data.items
+              })
+          })
       },
       loadVideo (id) {
         socket.emit('trackNewVideo', id)
