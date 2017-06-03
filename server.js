@@ -34,8 +34,8 @@ io.on('connection', socket => {
         room.viewers.push(userId)
       }
       room.video.currentTime = roomInterval[roomId].time
-      io.emit('updatedData', room)
     }
+    io.emit('updatedData', room)
   })
 
   socket.on('updatePlayerState', state => {

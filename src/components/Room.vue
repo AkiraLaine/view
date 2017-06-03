@@ -149,7 +149,10 @@
     methods: {
       initSocketListeners () {
         socket.on('updatedData', room => {
-          console.log(room)
+          if (!room) {
+            window.history.replaceState('', '', '/room')
+            window.location.reload()
+          }
           if (room.id === this.$route.params.roomId) this.room = room
         })
       },
@@ -344,6 +347,7 @@
   width: 80%;
   height: 100%;
   padding-top: 40px;
+  justify-content: center;
 }
 .video-container {
   position: relative;
